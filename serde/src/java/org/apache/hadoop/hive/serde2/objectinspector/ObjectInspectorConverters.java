@@ -24,8 +24,9 @@ import java.util.Map;
 
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.JavaStringObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorConverter;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.SettableBooleanObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.SettableBigDecimalObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.SettableBinaryObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.SettableBooleanObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.SettableByteObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.SettableDoubleObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.SettableFloatObjectInspector;
@@ -116,7 +117,11 @@ public final class ObjectInspectorConverters {
       case BINARY:
         return new PrimitiveObjectInspectorConverter.BinaryConverter(
             (PrimitiveObjectInspector)inputOI,
-            (SettableBinaryObjectInspector)outputOI);
+            (SettableBinaryObjectInspector) outputOI);
+      case DECIMAL:
+        return new PrimitiveObjectInspectorConverter.BigDecimalConverter(
+            (PrimitiveObjectInspector) inputOI,
+            (SettableBigDecimalObjectInspector) outputOI);
 
       default:
         throw new RuntimeException("Hive internal error: conversion of "

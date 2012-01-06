@@ -25,8 +25,9 @@ import org.apache.hadoop.hive.serde2.lazy.objectinspector.LazyMapObjectInspector
 import org.apache.hadoop.hive.serde2.lazy.objectinspector.LazyObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.lazy.objectinspector.LazySimpleStructObjectInspector;
 import org.apache.hadoop.hive.serde2.lazy.objectinspector.LazyUnionObjectInspector;
-import org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive.LazyBooleanObjectInspector;
+import org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive.LazyBigDecimalObjectInspector;
 import org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive.LazyBinaryObjectInspector;
+import org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive.LazyBooleanObjectInspector;
 import org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive.LazyByteObjectInspector;
 import org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive.LazyDoubleObjectInspector;
 import org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive.LazyFloatObjectInspector;
@@ -81,6 +82,8 @@ public final class LazyFactory {
       return new LazyTimestamp((LazyTimestampObjectInspector) oi);
     case BINARY:
       return new LazyBinary((LazyBinaryObjectInspector) oi);
+    case DECIMAL:
+      return new LazyBigDecimal((LazyBigDecimalObjectInspector) oi);
     default:
       throw new RuntimeException("Internal error: no LazyObject for " + p);
     }
@@ -110,7 +113,7 @@ public final class LazyFactory {
   /**
    * Create a hierarchical ObjectInspector for LazyObject with the given
    * typeInfo.
-   * 
+   *
    * @param typeInfo
    *          The type information for the LazyObject
    * @param separator
@@ -180,7 +183,7 @@ public final class LazyFactory {
   /**
    * Create a hierarchical ObjectInspector for LazyStruct with the given
    * columnNames and columnTypeInfos.
-   * 
+   *
    * @param lastColumnTakesRest
    *          whether the last column of the struct should take the rest of the
    *          row if there are extra fields.
@@ -205,7 +208,7 @@ public final class LazyFactory {
   /**
    * Create a hierarchical ObjectInspector for ColumnarStruct with the given
    * columnNames and columnTypeInfos.
-   * 
+   *
    * @see LazyFactory#createLazyObjectInspector(TypeInfo, byte[], int, Text,
    *      boolean, byte)
    */

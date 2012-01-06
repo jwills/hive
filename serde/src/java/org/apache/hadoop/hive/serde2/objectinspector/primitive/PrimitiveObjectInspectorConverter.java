@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.hive.serde2.objectinspector.primitive;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 import org.apache.hadoop.hive.serde2.ByteStream;
@@ -258,7 +259,7 @@ public class PrimitiveObjectInspectorConverter {
     }
   }
 
-  public static class BinaryConverter implements Converter{
+  public static class BinaryConverter implements Converter {
 
     PrimitiveObjectInspector inputOI;
     SettableBinaryObjectInspector outputOI;
@@ -276,6 +277,27 @@ public class PrimitiveObjectInspectorConverter {
     @Override
     public Object convert(Object input) {
       return outputOI.set(r, PrimitiveObjectInspectorUtils.getBinary(input,
+          inputOI));
+    }
+
+  }
+
+  public static class BigDecimalConverter implements Converter {
+
+    PrimitiveObjectInspector inputOI;
+    SettableBigDecimalObjectInspector outputOI;
+    Object r;
+
+    public BigDecimalConverter(PrimitiveObjectInspector inputOI,
+        SettableBigDecimalObjectInspector outputOI) {
+      this.inputOI = inputOI;
+      this.outputOI = outputOI;
+      this.r = outputOI.create(BigDecimal.ZERO);
+    }
+
+    @Override
+    public Object convert(Object input) {
+      return outputOI.set(r, PrimitiveObjectInspectorUtils.getBigDecimal(input,
           inputOI));
     }
 
@@ -344,6 +366,10 @@ public class PrimitiveObjectInspectorConverter {
         return t;
       case BINARY:
         t.set(((BinaryObjectInspector) inputOI).getPrimitiveWritableObject(input).getBytes());
+        return t;
+      case DECIMAL:
+        t.set(((BigDecimalObjectInspector) inputOI)
+            .getPrimitiveJavaObject(input).toString());
         return t;
       default:
         throw new RuntimeException("Hive 2 Internal error: type = " + inputOI.getTypeName());
