@@ -166,8 +166,8 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDFFromUtcTimestamp;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFHash;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFIf;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFIn;
-import org.apache.hadoop.hive.ql.udf.generic.GenericUDFIndex;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFInFile;
+import org.apache.hadoop.hive.ql.udf.generic.GenericUDFIndex;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFInstr;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFLocate;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFMap;
@@ -193,6 +193,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDFStringToMap;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFStruct;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFTimestamp;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFToBinary;
+import org.apache.hadoop.hive.ql.udf.generic.GenericUDFToDecimal;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFToUtcTimestamp;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFUnion;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFWhen;
@@ -220,10 +221,8 @@ import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.util.ReflectionUtils;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -393,6 +392,8 @@ public final class FunctionRegistry {
         GenericUDFTimestamp.class);
     registerGenericUDF(Constants.BINARY_TYPE_NAME,
         GenericUDFToBinary.class);
+    registerGenericUDF(Constants.DECIMAL_TYPE_NAME,
+        GenericUDFToDecimal.class);
 
     // Aggregate functions
     registerGenericUDAF("max", new GenericUDAFMax());
