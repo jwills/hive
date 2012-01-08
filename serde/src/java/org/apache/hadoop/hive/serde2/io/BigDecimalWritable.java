@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import org.apache.hadoop.hive.serde2.ByteStream.Output;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.WritableUtils;
 
@@ -56,6 +57,7 @@ public class BigDecimalWritable implements WritableComparable<BigDecimalWritable
 
   public void set(byte[] bytes, int scale) {
     this.internalStorage = bytes;
+    this.scale = scale;
   }
 
   public BigDecimal getBigDecimal() {
@@ -64,7 +66,7 @@ public class BigDecimalWritable implements WritableComparable<BigDecimalWritable
 
   @Override
   public void readFields(DataInput in) throws IOException {
-    WritableUtils.readVInt(in);
+    scale = WritableUtils.readVInt(in);
     int byteArrayLen = WritableUtils.readVInt(in);
     if (internalStorage.length != byteArrayLen) {
       internalStorage = new byte[byteArrayLen];
@@ -84,4 +86,13 @@ public class BigDecimalWritable implements WritableComparable<BigDecimalWritable
     return getBigDecimal().compareTo(that.getBigDecimal());
   }
 
+  public void writeToByteStream(Output byteStream) {
+    byteStream.write(scale);
+    byteStream.write(internalStorage, 0, internalStorage.length);
+  }
+
+  @Override
+  public String toString() {
+    return getBigDecimal().toString();
+  }
 }
