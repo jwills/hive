@@ -19,6 +19,7 @@
 package org.apache.hadoop.hive.ql.udf;
 
 import org.apache.hadoop.hive.ql.exec.Description;
+import org.apache.hadoop.hive.serde2.io.BigDecimalWritable;
 import org.apache.hadoop.hive.serde2.io.ByteWritable;
 import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 import org.apache.hadoop.hive.serde2.io.ShortWritable;
@@ -31,7 +32,7 @@ import org.apache.hadoop.io.LongWritable;
  * better performance and type checking (so we know int + int is still an int
  * instead of a double); otherwise a single method that takes (Number a, Number
  * b) and use a.doubleValue() == b.doubleValue() is enough.
- * 
+ *
  * The case of int + double will be handled by implicit type casting using
  * UDFRegistry.implicitConvertable method.
  */
@@ -111,6 +112,16 @@ public class UDFOPPlus extends UDFBaseNumericOp {
 
     doubleWritable.set(a.get() + b.get());
     return doubleWritable;
+  }
+
+  @Override
+  public BigDecimalWritable evaluate(BigDecimalWritable a, BigDecimalWritable b) {
+    if ((a == null) || (b == null)) {
+      return null;
+    }
+
+    bigDecimalWritable.set(a.getBigDecimal().add(b.getBigDecimal()));
+    return bigDecimalWritable;
   }
 
 }
