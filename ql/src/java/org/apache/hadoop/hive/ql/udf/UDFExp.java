@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.ql.udf;
 
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
+import org.apache.hadoop.hive.serde2.io.BigDecimalWritable;
 import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 
 /**
@@ -31,7 +32,7 @@ import org.apache.hadoop.hive.serde2.io.DoubleWritable;
     extended = "Example:\n "
     + "  > SELECT _FUNC_(0) FROM src LIMIT 1;\n" + "  1")
 public class UDFExp extends UDF {
-  private DoubleWritable result = new DoubleWritable();
+  private final DoubleWritable result = new DoubleWritable();
 
   public UDFExp() {
   }
@@ -48,4 +49,12 @@ public class UDFExp extends UDF {
     }
   }
 
+  public DoubleWritable evaluate(BigDecimalWritable a) {
+    if (a == null) {
+      return null;
+    } else {
+      result.set(Math.exp(a.getBigDecimal().doubleValue()));
+      return result;
+    }
+  }
 }

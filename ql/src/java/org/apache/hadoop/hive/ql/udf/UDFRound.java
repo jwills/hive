@@ -19,10 +19,12 @@
 package org.apache.hadoop.hive.ql.udf;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
+import org.apache.hadoop.hive.serde2.io.BigDecimalWritable;
 import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -36,8 +38,9 @@ import org.apache.hadoop.io.LongWritable;
     extended = "Example:\n"
     + "  > SELECT _FUNC_(12.3456, 1) FROM src LIMIT 1;\n" + "  12.3'")
 public class UDFRound extends UDF {
-  private DoubleWritable doubleWritable = new DoubleWritable();
-  private LongWritable longWritable = new LongWritable();
+  private final DoubleWritable doubleWritable = new DoubleWritable();
+  private final LongWritable longWritable = new LongWritable();
+  private final BigDecimalWritable bigDecimalWritable = new BigDecimalWritable();
 
   public UDFRound() {
   }
@@ -65,4 +68,14 @@ public class UDFRound extends UDF {
     return doubleWritable;
   }
 
+  public BigDecimalWritable evaluate(BigDecimalWritable n, IntWritable i) {
+    if ((n == null) || (i == null)) {
+      return null;
+    }
+    BigDecimal bd = n.getBigDecimal();
+    MathContext mc = new MathContext(
+        bd.precision() - (bd.scale() - i.get()), RoundingMode.HALF_UP);
+    bigDecimalWritable.set(bd.round(mc));
+    return bigDecimalWritable;
+  }
 }

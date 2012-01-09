@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.ql.udf;
 
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
+import org.apache.hadoop.hive.serde2.io.BigDecimalWritable;
 import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 
 /**
@@ -30,7 +31,7 @@ import org.apache.hadoop.hive.serde2.io.DoubleWritable;
     extended = "Example:\n "
     + "  > SELECT _FUNC_(4) FROM src LIMIT 1;\n" + "  2")
 public class UDFSqrt extends UDF {
-  private DoubleWritable result = new DoubleWritable();
+  private final DoubleWritable result = new DoubleWritable();
 
   public UDFSqrt() {
   }
@@ -49,4 +50,17 @@ public class UDFSqrt extends UDF {
     }
   }
 
+  public DoubleWritable evaluate(BigDecimalWritable i) {
+    if (i == null) {
+      return null;
+    } else {
+      double v = i.getBigDecimal().doubleValue();
+      if (v < 0) {
+        return null;
+      } else {
+        result.set(Math.sqrt(i.getBigDecimal().doubleValue()));
+        return result;
+      }
+    }
+  }
 }
