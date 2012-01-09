@@ -622,7 +622,8 @@ public final class FunctionRegistry {
     registerNumericType(Constants.BIGINT_TYPE_NAME, 4);
     registerNumericType(Constants.FLOAT_TYPE_NAME, 5);
     registerNumericType(Constants.DOUBLE_TYPE_NAME, 6);
-    registerNumericType(Constants.STRING_TYPE_NAME, 7);
+    registerNumericType(Constants.DECIMAL_TYPE_NAME, 7);
+    registerNumericType(Constants.STRING_TYPE_NAME, 8);
   }
 
   /**
