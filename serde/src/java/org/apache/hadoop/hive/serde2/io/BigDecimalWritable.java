@@ -22,7 +22,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,22 +66,18 @@ public class BigDecimalWritable implements WritableComparable<BigDecimalWritable
     this.scale = scale;
   }
 
+  private final VInt vInt = new VInt();
+
   public void setFromBytes(byte[] bytes, int offset, int length) {
-    VInt vInt = new VInt();
     LazyBinaryUtils.readVInt(bytes, offset, vInt);
-    LOG.info("Bytes offset: " + offset + " length: " + bytes.length);
-    LOG.info("value: " + vInt.value + " length: " + vInt.length);
     scale = vInt.value;
-    int delta = vInt.length;
-    LazyBinaryUtils.readVInt(bytes, offset + delta, vInt);
-    LOG.info("value: " + vInt.value + " length: " + vInt.length);
-    delta += vInt.length;
+    offset += vInt.length;
+    LazyBinaryUtils.readVInt(bytes, offset, vInt);
+    offset += vInt.length;
     if (internalStorage.length != vInt.value) {
       internalStorage = new byte[vInt.value];
     }
-    LOG.info("bytes: " + Arrays.toString(bytes));
-    LOG.info("FYI: " + new BigInteger(new byte[] { 6, -63 }));
-    System.arraycopy(bytes, offset + delta, internalStorage, 0, vInt.value);
+    System.arraycopy(bytes, offset, internalStorage, 0, vInt.value);
   }
 
   public BigDecimal getBigDecimal() {
