@@ -22,12 +22,19 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hive.serde2.ByteStream.Output;
+import org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryUtils;
+import org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryUtils.VInt;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.WritableUtils;
 
 public class BigDecimalWritable implements WritableComparable<BigDecimalWritable> {
+
+  static final private Log LOG = LogFactory.getLog(BigDecimalWritable.class);
 
   private byte[] internalStorage = new byte[0];
   private int scale;
@@ -60,6 +67,24 @@ public class BigDecimalWritable implements WritableComparable<BigDecimalWritable
     this.scale = scale;
   }
 
+  public void setFromBytes(byte[] bytes, int offset, int length) {
+    VInt vInt = new VInt();
+    LazyBinaryUtils.readVInt(bytes, offset, vInt);
+    LOG.info("Bytes offset: " + offset + " length: " + bytes.length);
+    LOG.info("value: " + vInt.value + " length: " + vInt.length);
+    scale = vInt.value;
+    int delta = vInt.length;
+    LazyBinaryUtils.readVInt(bytes, offset + delta, vInt);
+    LOG.info("value: " + vInt.value + " length: " + vInt.length);
+    delta += vInt.length;
+    if (internalStorage.length != vInt.value) {
+      internalStorage = new byte[vInt.value];
+    }
+    LOG.info("bytes: " + Arrays.toString(bytes));
+    LOG.info("FYI: " + new BigInteger(new byte[] { 6, -63 }));
+    System.arraycopy(bytes, offset + delta, internalStorage, 0, vInt.value);
+  }
+
   public BigDecimal getBigDecimal() {
     return new BigDecimal(new BigInteger(internalStorage), scale);
   }
@@ -87,7 +112,8 @@ public class BigDecimalWritable implements WritableComparable<BigDecimalWritable
   }
 
   public void writeToByteStream(Output byteStream) {
-    byteStream.write(scale);
+    LazyBinaryUtils.writeVInt(byteStream, scale);
+    LazyBinaryUtils.writeVInt(byteStream, internalStorage.length);
     byteStream.write(internalStorage, 0, internalStorage.length);
   }
 
